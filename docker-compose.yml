@@ -5,7 +5,7 @@ services:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: aurarestaurante
     ports:
       - "5432:5432"
@@ -23,7 +23,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://user:password@postgres:5432/aurarestaurante?schema=public
+      DATABASE_URL: ${DATABASE_URL:-postgresql://user:password@postgres:5432/aurarestaurante?schema=public}
     depends_on:
       postgres:
         condition: service_healthy
