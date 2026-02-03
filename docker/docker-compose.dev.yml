@@ -19,20 +19,37 @@ services:
     restart: always
 
   backend:
-    build: ./backend
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+      target: builder # Use builder stage to have dev dependencies
+    command: npm run start:dev
     ports:
       - "3000:3000"
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgresql://user:password@postgres:5432/aurarestaurante?schema=public}
+      JWT_SECRET: ${JWT_SECRET:-dev_secret_key}
+      NODE_ENV: development
+    volumes:
+      - ../backend:/app
+      - /app/node_modules
     depends_on:
       postgres:
         condition: service_healthy
-    restart: always
 
   frontend:
-    build: ./frontend
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      target: builder # Use builder stage
+    command: npm run dev -- --host
     ports:
-      - "80:80"
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
 
